@@ -1,0 +1,110 @@
+define :snare do |v|
+  sample :sn_generic, rate: 2, amp: v, attack: 0, sustain: 0, release: 0, decay: 0.06
+  sample :drum_snare_hard, rate: 2, amp: v/2, attack: 0.01, sustain: 0, release: 0, decay: 0.03
+end
+
+define :hat do |v|
+  sample :drum_cymbal_closed, amp: 1.5*v, attack: 0, decay: 0.01, sustain: 0, release: 0
+end
+
+define :efx do |r1, r2|
+  play (chord :F, :minor), amp: 1.2, release: r1
+  sleep 0.5
+  play (chord :G, :minor), amp: 1.2, release: r2
+  sleep 0.5
+end
+
+
+atv_hat =0
+aux_hat=0
+
+atv_add =0
+aux_add=0
+
+
+use_bpm 80
+
+
+live_loop :melodia do
+  use_synth :piano
+  #sync :hit
+  #stop
+  play (chord :F, :minor)
+  sleep 0.5
+  play (chord :G, :minor)
+  sleep 0.5
+  play (chord :D, :major)
+  sleep 1
+  play (chord :F, :minor7), release: 1
+  sleep 0.8
+  play (chord :D, :minor7), release: 1
+  sleep 0.5
+  play (chord :D, :minor7), release: 1
+  sleep 0.5
+  play (chord :D, :minor7), release: 1
+  sleep 0.25
+end
+
+live_loop :hit do
+  #sync :melodia
+  #stop
+  sample :bd_mehackit, amp: 0.4
+  sleep 0.5
+  sample :bd_mehackit, amp:0.4
+  sleep 0.5
+  snare 1
+  sleep 1
+  sample :bd_mehackit, amp: 0.4
+  sleep 0.8
+  snare 1
+  sleep 0.5
+  snare 1
+  sleep 0.5
+  snare 1
+  sleep 0.25
+end
+
+live_loop :hats do
+  #stop
+  sync :melodia
+  if atv_hat<=2
+    atv_hat +=1
+    2.times do
+      hat 1
+      sleep 0.3
+      hat 1
+      sleep 0.3
+      hat 1
+      sleep 0.4
+    end
+  else atv_hat >=3
+    if aux_hat == 0
+      aux_hat+=1
+    else
+      aux_hat=0
+      atv_hat =0
+    end
+    8.times do
+      hat 1
+      sleep 0.25
+    end
+  end
+end
+
+live_loop :add do
+  #stop
+  sync :melodia
+  use_synth :tb303
+  if atv_add<=2
+    atv_add +=1
+    efx 0.2, 0.2
+  else atv_add >=3
+    if aux_add <5
+      aux_add+=1
+    else
+      aux_add=0
+      atv_add =0
+    end
+    efx 0.2, 0.8
+  end
+end
